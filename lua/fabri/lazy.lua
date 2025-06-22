@@ -98,11 +98,11 @@ require('lazy').setup({
   {
     'numToStr/Comment.nvim',
   },
-  {
-    'nvim-tree/nvim-tree.lua',
-    dependencies = {
-      'nvim-tree/nvim-web-devicons',
-    }
+ {
+    'stevearc/oil.nvim',
+    opts = {},
+    dependencies = { "echasnovski/mini.icons" },
+    lazy = false,
   },
   {
     'kristijanhusak/vim-dadbod-ui',
