@@ -3,7 +3,7 @@
 -- 🔍 Telescope (fuzzy finder)
 -- 🎨 Gruvbox (colorscheme)
 -- 🛠 LSP & code tools (treesitter, lsp-zero, mason, etc.)
--- ⚡ Productivity (harpoon, undotree, oil.nvim, dbui)
+-- ⚡ Productivity (harpoon, undotree, oil.nvim)
 -- 💻 UI enhancements (lualine, nvim-tree, dashboard, highlight-colors)
 -- 📟 Terminal integration (toggleterm)
 
@@ -31,23 +31,6 @@ require('lazy').setup({
     dependencies = { 'nvim-lua/plenary.nvim' }
   },
 
-  -- Gruvbox colorscheme
-  {
-    'ellisonleao/gruvbox.nvim',
-    priority = 1000,
-    config = function()
-      require('gruvbox').setup({
-        transparent_mode = true,
-        overrides = {
-          Normal = { bg = "none" },
-          NormalFloat = { bg = "none" },
-          CursorLine = { bg = "none" },
-        }
-      })
-      vim.cmd.colorscheme("gruvbox")
-    end
-  },
-
   -- Status line
   {
     'nvim-lualine/lualine.nvim',
@@ -65,6 +48,8 @@ require('lazy').setup({
   -- Syntax highlighting and code context
   { 'nvim-treesitter/nvim-treesitter', build = ':TSUpdate' },
   { 'nvim-treesitter/nvim-treesitter-context' },
+  {"rhysd/git-messenger.vim", dependencies = { "nvim-lua/plenary.nvim" },},
+
 
   -- LSP and completion tools
   { 'VonHeikemen/lsp-zero.nvim', branch = 'v3.x' },
@@ -74,13 +59,10 @@ require('lazy').setup({
   { 'hrsh7th/nvim-cmp' },
   { 'hrsh7th/cmp-nvim-lsp' },
   { 'L3MON4D3/LuaSnip' },
+  {"monkoose/neocodeium", event = "VeryLazy"},
+
 
   -- Productivity tools
-  {
-    'theprimeagen/harpoon',
-    branch = 'harpoon2',
-    dependencies = { 'nvim-lua/plenary.nvim', 'nvim-telescope/telescope.nvim' }
-  },
   { 'mbbill/undotree' },
   { 'windwp/nvim-ts-autotag' },
   { 'windwp/nvim-autopairs', event = "InsertEnter" },
@@ -91,18 +73,7 @@ require('lazy').setup({
     dependencies = { "echasnovski/mini.icons" },
     lazy = false,
   },
-  {
-    'kristijanhusak/vim-dadbod-ui',
-    dependencies = {
-      { 'tpope/vim-dadbod', lazy = true },
-      { 'kristijanhusak/vim-dadbod-completion', ft = { 'sql', 'mysql', 'plsql' }, lazy = true },
-    },
-    cmd = { 'DBUI', 'DBUIToggle', 'DBUIAddConnection', 'DBUIFindBuffer' },
-    init = function()
-      vim.g.db_ui_use_nerd_fonts = 1
-    end,
-  },
-
+  
   -- Terminal integration
   {
     'akinsho/toggleterm.nvim',
@@ -111,6 +82,8 @@ require('lazy').setup({
   },
 
   -- UI enhancements
+  {'nvim-tree/nvim-web-devicons' },
+  {"vyfor/cord.nvim", build = ":Cord update", event = "VeryLazy" },
   { 'brenoprata10/nvim-highlight-colors' },
   {
     'nvimdev/dashboard-nvim',

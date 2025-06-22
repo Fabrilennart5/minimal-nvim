@@ -4,6 +4,7 @@
 -- Tab/identation behavior
 -- File handling (undo, backus)
 -- Search and UI preferences.
+vim.cmd.colorscheme('gruvbox')
 vim.opt.nu = true
 vim.opt.relativenumber = true
 vim.opt.cursorline = true
