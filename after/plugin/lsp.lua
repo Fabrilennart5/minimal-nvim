@@ -1,22 +1,22 @@
 --[[
   My LSP (Language Server Protocol) Configuration
-  Features:
+  Features I use:
   - lsp-zero for simplified LSP setup
   - Key mappings for common LSP actions
   - Mason for automatic LSP installation
   - Auto-formatting on save
   - Advanced autocompletion (nvim-cmp)
-  - Language-specific configurations
-
-  Configured for:
-  - Lua, Go, C/C++, HTML, TypeScript, Assembly
-  - SQL via vim-dadbod
-  - Additional tooling (autopairs, autotag, color highlighting)
+  
+  Languages I work with:
+  - Python, Java, Rust
+  - Web: HTML, JavaScript, CSS
+  - SQL, Markdown
+  - Lua (for Neovim config)
 --]]
 
 local lsp = require('lsp-zero')
 
--- LSP key mappings for common actions
+-- My preferred LSP key mappings
 lsp.on_attach(function(client, bufnr)
   local opts = { buffer = bufnr, remap = false }
 
@@ -37,7 +37,7 @@ lsp.on_attach(function(client, bufnr)
   vim.keymap.set("i", "<C-h>", function() vim.lsp.buf.signature_help() end, opts) -- Signature help
 end)
 
--- Mason configuration for LSP installation
+-- Configure Mason to manage my LSP servers
 local lspconfig = require('lspconfig')
 require('mason').setup({
   registries = {
@@ -46,58 +46,56 @@ require('mason').setup({
   }
 })
 
--- Language servers to auto-install
+-- List of LSP servers I want automatically installed
 require('mason-lspconfig').setup({
   ensure_installed = {
-    'html', 'clangd', 'emmet_language_server', 'gopls', 
-    'lua_ls', 'ts_ls', 'asm_lsp'
+    'pyright',        -- Python
+    'jdtls',          -- Java
+    'rust_analyzer',  -- Rust
+    'html',           -- HTML
+    'cssls',          -- CSS
+    'sqlls',          -- SQL
+    'marksman',       -- executables       
   },
   handlers = {
     lsp.default_setup,
-    -- Language-specific configurations
+    -- Special configuration only for Lua
     lua_ls = function()
       local lua_opts = lsp.nvim_lua_ls()
-      lspconfig.lua_ls.setup(lua_opts)
+      lspconfig.lua_ls.setup(vim.tbl_deep_extend("force", lua_opts, {
+        cmd = { "/run/current-system/sw/bin/lua-language-server" }
+      }))
     end,
-    gopls = function()
-      lspconfig.gopls.setup({
-        settings = {
-          gopls = {
-            hints = {
-              assignVariableTypes = true,
-              compositeLiteralTypes = true,
-              constantValues = true,
-              functionTypeParameters = true,
-              parameterNames = true,
-              rangeVariableTypes = true,
-            }
-          }
-        },
-      })
+    -- Minimal config for Rust
+    rust_analyzer = function()
+      lspconfig.rust_analyzer.setup({})
     end,
-    asm_lsp = function()
-      lspconfig.asm_lsp.setup({})
-    end,
+    -- Minimal config for Python
+    pyright = function()
+      lspconfig.pyright.setup({})
+    end
   }
 })
 
--- Auto-formatting on save with timeout
+-- Auto-format files on save for these languages
 lsp.format_on_save({
   format_opts = {
     async = false,
     timeout_ms = 10000,
   },
   servers = {
-    ['ts_ls'] = { "javascript", "javascriptreact", "json", "jsonc", "typescript", "typescript.tsx", "typescriptreact", "astro", "svelte", "css" },
+    ['tsserver'] = { "javascript", "typescript" },
     ['html'] = { 'html' },
-    ['clangd'] = { 'c', 'cpp', 'h', 'hpp' },
-    ['gopls'] = { 'go' },
+    ['pyright'] = { 'python' },
+    ['rust_analyzer'] = { 'rust' },
+    ['jdtls'] = { 'java' },
+    ['cssls'] = { 'css' },
     ['lua_ls'] = { 'lua' },
-    ['asm_lsp'] = { 'asm', 's', 'S' },
+    ['marksman'] = { 'markdown' }
   },
 })
 
--- Autocompletion setup with nvim-cmp
+-- My autocompletion setup (nvim-cmp)
 local cmp = require('cmp')
 local cmp_format = lsp.cmp_format()
 local cmp_select = { behavior = cmp.SelectBehavior.Select }
@@ -117,7 +115,7 @@ cmp.setup({
   mapping = cmp_mappings
 })
 
--- Special setup for SQL via vim-dadbod
+-- Special setup for SQL (using vim-dadbod)
 cmp.setup.filetype('sql', {
   sources = cmp.config.sources({
     { name = 'vim-dadbod-completion' },
@@ -125,12 +123,11 @@ cmp.setup.filetype('sql', {
   })
 })
 
--- Additional configurations
+-- Additional configurations I find useful
 vim.cmd([[autocmd FileType dbout setlocal nofoldenable]]) -- Disable folding for dbout
 vim.diagnostic.config({ virtual_text = true }) -- Show diagnostic messages inline
-vim.g.c_syntax_for_h = 1 -- Treat .h files as C files
 
--- Plugin integrations
+-- Plugin integrations I use
 require('nvim-autopairs').setup() -- Auto-pair brackets/quotes
 require('nvim-ts-autotag').setup() -- Auto-close HTML tags
 require('nvim-highlight-colors').setup() -- Color preview
