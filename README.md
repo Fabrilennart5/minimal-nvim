@@ -1,4 +1,7 @@
-# Neovim Configuration Workflow
+# My Neovim Configuration
+
+---
+![Captura de pantalla de mi configuración de Neovim](https://pbs.twimg.com/media/GuEJAjrXIAAti1G?format=jpg&name=medium)
 
 ---
 
