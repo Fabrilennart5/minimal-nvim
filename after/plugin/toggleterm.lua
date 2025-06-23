@@ -1,5 +1,5 @@
 require("toggleterm").setup({
-  size = 10, -- terminal height (for horizontal) or width (for vertical)
+  size = 20, -- terminal height (for horizontal) or width (for vertical)
   open_mapping = nil, -- no default mapping, we define our own
   shade_filetypes = {},
   shade_terminals = true,
