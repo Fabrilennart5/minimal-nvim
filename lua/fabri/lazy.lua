@@ -35,13 +35,11 @@ require('lazy').setup({
   { 'williamboman/mason-lspconfig.nvim' },
   { 'hrsh7th/nvim-cmp' },
   { 'hrsh7th/cmp-nvim-lsp' },
- -- { 'L3MON4D3/LuaSnip' },
   { 'nvim-treesitter/nvim-treesitter', build = ':TSUpdate' },
   { 'nvim-treesitter/nvim-treesitter-context' },
   { 'rhysd/git-messenger.vim', dependencies = { 'nvim-lua/plenary.nvim' } },
 
   -- ⚡ Productivity
-  { 'mbbill/undotree' },
   { 'windwp/nvim-ts-autotag' },
   { 'windwp/nvim-autopairs', event = 'InsertEnter' },
   { 'numToStr/Comment.nvim' },
