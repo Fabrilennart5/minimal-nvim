@@ -1,43 +1,51 @@
-local dap = require("dap")            -- Load the main DAP module
-local dapui = require("dapui")        -- Load the DAP UI module for better interface
-local dap_python = require("dap-python")  -- Load Python-specific DAP adapter
+local dap = require("dap")
+local dap_python = require("dap-python")
+local dapui = require("dapui")
 
-dapui.setup({})                      -- Initialize DAP UI with default settings
+-- Setup dap-python with python3
+dap_python.setup("python3")
 
+-- Setup dap-ui
+dapui.setup({
+  icons = { expanded = "▾", collapsed = "▸", current_frame = "▶" },
+  layouts = {
+    {
+      elements = {
+        { id = "scopes", size = 0.25 },
+        { id = "breakpoints", size = 0.25 },
+        { id = "stacks", size = 0.25 },
+        { id = "watches", size = 0.25 },
+      },
+      position = "left",
+      size = 40,
+    },
+    {
+      elements = {
+        { id = "repl", size = 0.5 },
+        { id = "console", size = 0.5 },
+      },
+      position = "bottom",
+      size = 10,
+    },
+  },
+  controls = { enabled = true, element = "repl" },
+})
+
+-- Setup virtual text for debugging values
 require("nvim-dap-virtual-text").setup({
-  commented = true,                  -- Show virtual text as comments next to code
+  commented = true,
+  enabled = true,
 })
 
-dap_python.setup("python3")          -- Setup Python DAP adapter using "python3" interpreter
+-- Define breakpoint signs with icons
+vim.fn.sign_define("DapBreakpoint", { text = "", texthl = "DiagnosticSignError" })
+vim.fn.sign_define("DapBreakpointRejected", { text = "", texthl = "DiagnosticSignError" })
+vim.fn.sign_define("DapStopped", { text = "", texthl = "DiagnosticSignWarn", linehl = "Visual", numhl = "DiagnosticSignWarn" })
 
--- Define signs for breakpoints and debugging status with icons and highlights
-vim.fn.sign_define("DapBreakpoint", {
-  text = "",                      -- Icon for a normal breakpoint
-  texthl = "DiagnosticSignError",  -- Use error highlight group
-  linehl = "",                     -- No line highlight
-  numhl = "",                      -- No number highlight
-})
-
-vim.fn.sign_define("DapBreakpointRejected", {
-  text = "",                      -- Icon for rejected breakpoint
-  texthl = "DiagnosticSignError",  -- Use error highlight group
-  linehl = "",
-  numhl = "",
-})
-
-vim.fn.sign_define("DapStopped", {
-  text = "",                      -- Icon for current stopped line (arrow)
-  texthl = "DiagnosticSignWarn",   -- Warning highlight group
-  linehl = "Visual",               -- Highlight the whole line visually
-  numhl = "DiagnosticSignWarn",   -- Highlight line number with warning color
-})
-
--- Auto open DAP UI when debugging starts
+-- Listeners to auto open/close dap-ui
 dap.listeners.after.event_initialized["dapui_config"] = function()
   dapui.open()
 end
-
--- Auto close DAP UI when debugging ends or exits
 dap.listeners.before.event_terminated["dapui_config"] = function()
   dapui.close()
 end
@@ -45,14 +53,13 @@ dap.listeners.before.event_exited["dapui_config"] = function()
   dapui.close()
 end
 
-local opts = { noremap = true, silent = true }  -- Options for keymaps: non-recursive and silent
-
--- Keymaps for common debugging commands
-vim.keymap.set("n", "<leader>db", dap.toggle_breakpoint, opts)  -- Toggle breakpoint
-vim.keymap.set("n", "<leader>dc", dap.continue, opts)           -- Continue/Start debugging
-vim.keymap.set("n", "<leader>do", dap.step_over, opts)          -- Step over next line
-vim.keymap.set("n", "<leader>di", dap.step_into, opts)          -- Step into function
-vim.keymap.set("n", "<leader>dO", dap.step_out, opts)           -- Step out of function
-vim.keymap.set("n", "<leader>dq", dap.terminate, opts)          -- Terminate debugging session
-vim.keymap.set("n", "<leader>du", dapui.toggle, opts)           -- Toggle DAP UI visibility
+-- Minimal keymaps for debugging
+local opts = { noremap = true, silent = true }
+vim.keymap.set("n", "<leader>db", dap.toggle_breakpoint, opts)
+vim.keymap.set("n", "<leader>dc", dap.continue, opts)
+vim.keymap.set("n", "<leader>do", dap.step_over, opts)
+vim.keymap.set("n", "<leader>di", dap.step_into, opts)
+vim.keymap.set("n", "<leader>dO", dap.step_out, opts)
+vim.keymap.set("n", "<leader>dq", dap.terminate, opts)
+vim.keymap.set("n", "<leader>du", dapui.toggle, opts)
 

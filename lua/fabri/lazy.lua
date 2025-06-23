@@ -54,15 +54,16 @@ require('lazy').setup({
   { 'nvim-tree/nvim-web-devicons' },
 
   -- 🐞 Debug Adapter Protocol (DAP) for debugging support
-  {
+{
   "mfussenegger/nvim-dap",
   dependencies = {
-    "nvim-neotest/nvim-nio",
-    "rcarriga/nvim-dap-ui",
-    "mfussenegger/nvim-dap-python",
-    "theHamsta/nvim-dap-virtual-text",
-    },
+    "nvim-neotest/nvim-nio",        -- Necesario para operaciones asíncronas
+    "rcarriga/nvim-dap-ui",         -- Interfaz visual para DAP
+    "mfussenegger/nvim-dap-python", -- Debugger específico para Python
+    "theHamsta/nvim-dap-virtual-text" -- Muestra valores de variables durante debugging
   },
+},
+
   
   -- 📟 Terminal integration
   { 'akinsho/toggleterm.nvim', version = '*' },
