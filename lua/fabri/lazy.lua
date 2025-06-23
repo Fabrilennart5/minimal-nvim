@@ -48,11 +48,23 @@ require('lazy').setup({
   { 'stevearc/oil.nvim', dependencies = { 'echasnovski/mini.icons' } },
 
   -- 💻 UI enhancements
-  { 'nvim-lualine/lualine.nvim', dependencies = { 'ellisonleao/gruvbox.nvim' } },
+  { 'ellisonleao/gruvbox.nvim' },
+  {'nvim-lualine/lualine.nvim', dependencies = { 'nvim-tree/nvim-web-devicons' }},
   { 'brenoprata10/nvim-highlight-colors' },
   { 'vyfor/cord.nvim', build = ':Cord update', event = 'VeryLazy' },
   { 'nvimdev/dashboard-nvim', event = 'VimEnter', dependencies = { 'juansalvatore/git-dashboard-nvim', 'nvim-lua/plenary.nvim' } },
   { 'nvim-tree/nvim-web-devicons' },
+
+  -- 🐞 Debug Adapter Protocol (DAP) for debugging support
+  {
+  "mfussenegger/nvim-dap",
+  dependencies = {
+    "nvim-neotest/nvim-nio",
+    "rcarriga/nvim-dap-ui",
+    "mfussenegger/nvim-dap-python",
+    "theHamsta/nvim-dap-virtual-text",
+    },
+  },
   
   -- 📟 Terminal integration
   { 'akinsho/toggleterm.nvim', version = '*' },
