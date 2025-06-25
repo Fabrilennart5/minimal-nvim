@@ -1,4 +1,3 @@
-
 -- My plugin management with Lazy.nvim
 -- Includes:
 -- 🔍 Telescope (fuzzy finder)
@@ -25,7 +24,7 @@ vim.opt.rtp:prepend(lazypath)
 
 require('lazy').setup({
   -- 🔍 Telescope (fuzzy finder)
-  { 'nvim-telescope/telescope.nvim', branch = '0.1.x', dependencies = { 'nvim-lua/plenary.nvim' } },
+  { 'nvim-telescope/telescope.nvim',    branch = '0.1.x', dependencies = { 'nvim-lua/plenary.nvim' } },
 
 
   -- 🛠 LSP & code tools
@@ -33,39 +32,42 @@ require('lazy').setup({
   { 'neovim/nvim-lspconfig' },
   { 'williamboman/mason.nvim' },
   { 'williamboman/mason-lspconfig.nvim' },
-  { 'hrsh7th/nvim-cmp' },
-  { 'hrsh7th/cmp-nvim-lsp' },
-  { 'nvim-treesitter/nvim-treesitter', build = ':TSUpdate' },
+
+  {
+    'saghen/blink.cmp',
+    dependencies = { 'rafamadriz/friendly-snippets' },
+    version = '1.*',
+  },
+  { 'nvim-treesitter/nvim-treesitter',        build = ':TSUpdate' },
   { 'nvim-treesitter/nvim-treesitter-context' },
-  { 'rhysd/git-messenger.vim', dependencies = { 'nvim-lua/plenary.nvim' } },
+  { 'rhysd/git-messenger.vim',                dependencies = { 'nvim-lua/plenary.nvim' } },
 
   -- ⚡ Productivity
   { 'windwp/nvim-ts-autotag' },
-  { 'windwp/nvim-autopairs', event = 'InsertEnter' },
+  { 'windwp/nvim-autopairs',                  event = 'InsertEnter' },
   { 'numToStr/Comment.nvim' },
-  { 'stevearc/oil.nvim', dependencies = { 'echasnovski/mini.icons' } },
+  { 'stevearc/oil.nvim',                      dependencies = { 'echasnovski/mini.icons' } },
 
   -- 💻 UI enhancements
   { 'ellisonleao/gruvbox.nvim' },
-  {'nvim-lualine/lualine.nvim', dependencies = { 'nvim-tree/nvim-web-devicons' }},
+  { 'nvim-lualine/lualine.nvim',              dependencies = { 'nvim-tree/nvim-web-devicons' } },
   { 'brenoprata10/nvim-highlight-colors' },
-  { 'vyfor/cord.nvim', build = ':Cord update', event = 'VeryLazy' },
-  { 'nvimdev/dashboard-nvim', event = 'VimEnter', dependencies = { 'juansalvatore/git-dashboard-nvim', 'nvim-lua/plenary.nvim' } },
+  { 'vyfor/cord.nvim',                        build = ':Cord update',                          event = 'VeryLazy' },
+  { 'nvimdev/dashboard-nvim',                 event = 'VimEnter',                              dependencies = { 'juansalvatore/git-dashboard-nvim', 'nvim-lua/plenary.nvim' } },
   { 'nvim-tree/nvim-web-devicons' },
 
   -- 🐞 Debug Adapter Protocol (DAP) for debugging support
-{
-  "mfussenegger/nvim-dap",
-  dependencies = {
-    "nvim-neotest/nvim-nio",        -- Necesario para operaciones asíncronas
-    "rcarriga/nvim-dap-ui",         -- Interfaz visual para DAP
-    "mfussenegger/nvim-dap-python", -- Debugger específico para Python
-    "theHamsta/nvim-dap-virtual-text" -- Muestra valores de variables durante debugging
+  {
+    "mfussenegger/nvim-dap",
+    dependencies = {
+      "nvim-neotest/nvim-nio",          -- Necesario para operaciones asíncronas
+      "rcarriga/nvim-dap-ui",           -- Interfaz visual para DAP
+      "mfussenegger/nvim-dap-python",   -- Debugger específico para Python
+      "theHamsta/nvim-dap-virtual-text" -- Muestra valores de variables durante debugging
+    },
   },
-},
 
-  
+
   -- 📟 Terminal integration
   { 'akinsho/toggleterm.nvim', version = '*' },
 })
-

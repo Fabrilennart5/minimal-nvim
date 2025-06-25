@@ -1,133 +1,102 @@
---[[
-  My LSP (Language Server Protocol) Configuration
-  Features I use:
-  - lsp-zero for simplified LSP setup
-  - Key mappings for common LSP actions
-  - Mason for automatic LSP installation
-  - Auto-formatting on save
-  - Advanced autocompletion (nvim-cmp)
-  
-  Languages I work with:
-  - Python, Java, Rust
-  - Web: HTML, JavaScript, CSS
-  - SQL, Markdown
-  - Lua (for Neovim config)
---]]
+-- after/plugin/lsp.lua
 
-local lsp = require('lsp-zero')
+local lspconfig = require('lspconfig')             -- Este módulo me permite configurar los servidores LSP
+local mason = require('mason')                     -- Mason es un gestor que me ayuda a instalar servidores LSP y otras herramientas automáticamente
+local mason_lspconfig = require('mason-lspconfig') -- Este conecta Mason con lspconfig para que la instalación y configuración sea más sencilla
+local blink = require('blink.cmp')                 -- blink.cmp es el plugin que uso para el autocompletado avanzado
 
--- My preferred LSP key mappings
-lsp.on_attach(function(client, bufnr)
-  local opts = { buffer = bufnr, remap = false }
+-- 1. Configurar Mason para que gestione la instalación de servidores LSP
+-- Esto me asegura que Mason esté listo para instalar y actualizar servidores cuando sea necesario
+mason.setup()
 
-  -- Navigation
-  vim.keymap.set("n", "gd", function() vim.lsp.buf.definition() end, opts) -- Go to definition
-  vim.keymap.set("n", "gr", function() vim.lsp.buf.references() end, opts) -- Find references
-  vim.keymap.set("n", "K", function() vim.lsp.buf.hover() end, opts) -- Show documentation
-  
-  -- Diagnostics
-  vim.keymap.set("n", "<leader>vws", function() vim.lsp.buf.workspace_symbol() end, opts) -- Workspace symbols
-  vim.keymap.set("n", "<leader>ge", function() vim.diagnostic.open_float() end, opts) -- Show diagnostic
-  vim.keymap.set("n", "<leader>ne", function() vim.diagnostic.goto_next() end, opts) -- Next diagnostic
-  vim.keymap.set("n", "<leader>pe", function() vim.diagnostic.goto_prev() end, opts) -- Previous diagnostic
-  
-  -- Code actions
-  vim.keymap.set("n", "<leader>ca", function() vim.lsp.buf.code_action() end, opts) -- Code actions
-  vim.keymap.set("n", "<leader>rn", function() vim.lsp.buf.rename() end, opts) -- Rename symbol
-  vim.keymap.set("i", "<C-h>", function() vim.lsp.buf.signature_help() end, opts) -- Signature help
-end)
-
--- Configure Mason to manage my LSP servers
-local lspconfig = require('lspconfig')
-require('mason').setup({
-  registries = {
-    "github:mason-org/mason-registry",
-    "github:Crashdummyy/mason-registry",
-  }
-})
-
--- List of LSP servers I want automatically installed
-require('mason-lspconfig').setup({
+-- 2. Le digo a Mason qué servidores LSP quiero que instale automáticamente para los lenguajes que uso
+-- Aquí agrego los servidores para Rust, Python (usando Ruff), Lua y Java
+mason_lspconfig.setup({
   ensure_installed = {
-    'pyright',        -- Python
-    'jdtls',          -- Java
-    'rust_analyzer',  -- Rust
-    'html',           -- HTML
-    'cssls',          -- CSS
-    'sqlls',          -- SQL
-    'marksman',       -- executables       
+    'rust_analyzer', -- Servidor para Rust
+    'ruff',          -- Servidor para Python usando Ruff
+    'lua_ls',        -- Servidor para Lua (muy útil para configurar Neovim)
+    'jdtls',         -- Servidor para Java
   },
-  handlers = {
-    lsp.default_setup,
-    -- Special configuration only for Lua
-    lua_ls = function()
-      local lua_opts = lsp.nvim_lua_ls()
-      lspconfig.lua_ls.setup(vim.tbl_deep_extend("force", lua_opts, {
-        cmd = { "/run/current-system/sw/bin/lua-language-server" }
-      }))
-    end,
-    -- Minimal config for Rust
-    rust_analyzer = function()
-      lspconfig.rust_analyzer.setup({})
-    end,
-    -- Minimal config for Python
-    pyright = function()
-      lspconfig.pyright.setup({})
+})
+
+-- 3. Creo las capacidades que usarán todos mis servidores LSP
+-- Las capacidades definen qué funcionalidades soporta el cliente LSP, aquí las extiendo con las que provee blink.cmp para autocompletado
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+capabilities = vim.tbl_deep_extend('force', capabilities, blink.get_lsp_capabilities())
+
+-- 4. Defino una función para configurar los servidores de forma sencilla y consistente
+-- Esta función recibe el nombre del servidor y opciones específicas, y siempre le pasa las capacidades extendidas
+local function setup_server(server_name, opts)
+  opts = opts or {}
+  opts.capabilities = capabilities
+  lspconfig[server_name].setup(opts)
+end
+
+-- 5. Configuro el servidor Rust Analyzer para Rust
+-- Aquí podría agregar opciones específicas si quiero, pero por ahora uso la configuración por defecto con capacidades extendidas
+setup_server('rust_analyzer')
+
+-- 6. Configuro el servidor Ruff para Python
+-- Igual que con Rust, uso la configuración básica con capacidades extendidas
+setup_server('ruff')
+
+-- 7. Configuro el servidor Lua Language Server con opciones especiales
+-- Esto es importante para que reconozca el entorno de Neovim (por ejemplo la variable global 'vim') y no marque errores innecesarios
+setup_server('lua_ls', {
+  settings = {
+    Lua = {
+      diagnostics = { globals = { 'vim' } },                             -- Le digo que 'vim' es una variable global válida
+      workspace = { library = vim.api.nvim_get_runtime_file("", true) }, -- Incluyo las librerías runtime de Neovim para autocompletado
+      telemetry = { enable = false },                                    -- Desactivo la telemetría para privacidad
+    },
+  },
+})
+
+-- 8. Configuro el servidor Java (jdtls)
+-- De nuevo, configuración básica con capacidades extendidas, puedes agregar opciones si quieres
+setup_server('jdtls')
+
+-- 9. Configuro un autocmd para autoformatear el código al guardar
+-- Esto aplica a los archivos con extensiones de los lenguajes que uso (Rust, Python, Lua, Java)
+-- Solo se formatea si el servidor LSP conectado soporta formateo
+vim.api.nvim_create_autocmd('BufWritePre', {
+  pattern = { "*.rs", "*.py", "*.lua", "*.java" },
+  callback = function()
+    local clients = vim.lsp.get_active_clients({ bufnr = vim.api.nvim_get_current_buf() })
+    for _, client in pairs(clients) do
+      if client.supports_method("textDocument/formatting") then
+        vim.lsp.buf.format({ async = false })
+        break
+      end
     end
-  }
+  end,
 })
 
--- Auto-format files on save for these languages
-lsp.format_on_save({
-  format_opts = {
-    async = false,
-    timeout_ms = 10000,
+-- 10. Configuro las opciones de diagnóstico visual en Neovim
+-- Esto controla cómo se muestran los errores y advertencias en el editor
+vim.diagnostic.config({
+  virtual_text = true,      -- Mostrar mensajes inline
+  signs = true,             -- Mostrar signos en la columna lateral
+  update_in_insert = false, -- No actualizar diagnósticos mientras escribo
+  underline = true,         -- Subrayar el texto con problemas
+  severity_sort = true,     -- Ordenar diagnósticos por severidad
+})
+
+-- 11. Finalmente, configuro blink.cmp para el autocompletado
+-- Aquí defino los atajos de teclado, apariencia y otras opciones para que la experiencia sea fluida y agradable
+require('blink.cmp').setup({
+  keymap = { preset = 'default' },
+  appearance = {
+    use_nvim_cmp_as_default = true,
+    nerd_font_variant = 'mono',
   },
-  servers = {
-    ['tsserver'] = { "javascript", "typescript" },
-    ['html'] = { 'html' },
-    ['pyright'] = { 'python' },
-    ['rust_analyzer'] = { 'rust' },
-    ['jdtls'] = { 'java' },
-    ['cssls'] = { 'css' },
-    ['lua_ls'] = { 'lua' },
-    ['marksman'] = { 'markdown' }
-  },
+  signature = { enabled = true },
 })
 
--- My autocompletion setup (nvim-cmp)
-local cmp = require('cmp')
-local cmp_format = lsp.cmp_format()
-local cmp_select = { behavior = cmp.SelectBehavior.Select }
-local cmp_mappings = cmp.mapping.preset.insert({
-  ['<C-k>'] = cmp.mapping.select_prev_item(cmp_select), -- Navigate up
-  ['<C-j>'] = cmp.mapping.select_next_item(cmp_select), -- Navigate down
-  ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Confirm selection
-  ['<C-Space>'] = cmp.mapping.complete(), -- Trigger completion
-})
-
--- Disable tab mapping to avoid conflicts
-cmp_mappings['<Tab>'] = nil
-cmp_mappings['<S-Tab>'] = nil
-
-cmp.setup({
-  formatting = cmp_format,
-  mapping = cmp_mappings
-})
-
--- Special setup for SQL (using vim-dadbod)
-cmp.setup.filetype('sql', {
-  sources = cmp.config.sources({
-    { name = 'vim-dadbod-completion' },
-    { name = 'buffer' },
-  })
-})
-
--- Additional configurations I find useful
-vim.cmd([[autocmd FileType dbout setlocal nofoldenable]]) -- Disable folding for dbout
-vim.diagnostic.config({ virtual_text = true }) -- Show diagnostic messages inline
-
--- Plugin integrations I use
-require('nvim-autopairs').setup() -- Auto-pair brackets/quotes
-require('nvim-ts-autotag').setup() -- Auto-close HTML tags
-require('nvim-highlight-colors').setup() -- Color preview
+-- ===== Cómo agregar más lenguajes o servidores =====
+-- 1. Primero asegúrate que Mason tenga el servidor disponible (https://github.com/williamboman/mason.nvim#available-packages)
+-- 2. Agrega el nombre del servidor en la lista 'ensure_installed' para que Mason lo instale automáticamente
+-- 3. En el bloque donde configuro servidores, agrega una llamada a setup_server con el nombre del servidor
+-- 4. Si el servidor requiere configuración especial, pásale las opciones en el segundo parámetro de setup_server
+-- 5. Si quieres que se autoformatee, añade la extensión del archivo en el patrón del autocmd de formateo
