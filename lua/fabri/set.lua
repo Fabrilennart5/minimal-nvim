@@ -1,36 +1,51 @@
--- My editor settings config!
--- Sets up:
--- Line number and cursor display
--- Tab/identation behavior
--- File handling (undo, backus)
--- Search and UI preferences.
-vim.cmd.colorscheme('gruvbox')
-vim.opt.nu = true
-vim.opt.relativenumber = true
-vim.opt.cursorline = true
+-- =============================================
+-- Configuración Básica del Editor
+-- =============================================
 
-vim.opt.tabstop = 2
-vim.opt.softtabstop = 2
-vim.opt.shiftwidth = 2
-vim.opt.expandtab = true
+-- ======================
+-- 1. Tema de Colores
+-- ======================
+vim.cmd.colorscheme('gruvbox')  -- Requiere tener instalado el plugin gruvbox.nvim
 
-vim.opt.smartindent = true
+-- ======================
+-- 2. Números de Línea y Cursor
+-- ======================
+vim.opt.nu = true                -- Muestra números de línea absolutos
+vim.opt.relativenumber = true    -- Muestra números de línea relativos
+vim.opt.cursorline = true        -- Resalta la línea actual del cursor
+vim.opt.colorcolumn = "1000"     -- Columna vertical guía (deshabilitada con valor alto)
+vim.opt.scrolloff = 8            -- Mínimo de líneas al hacer scroll
+vim.opt.signcolumn = "yes"       -- Columna para marcadores (errores, git, etc.)
 
-vim.opt.wrap = false
+-- ======================
+-- 3. Configuración de Indentación
+-- ======================
+vim.opt.tabstop = 2              -- Espacios por tabulación
+vim.opt.softtabstop = 2          -- Espacios por tab al editar
+vim.opt.shiftwidth = 2           -- Espacios para indentación automática
+vim.opt.expandtab = true         -- Convierte tabs en espacios
+vim.opt.smartindent = true       -- Indentación inteligente
+vim.opt.wrap = false             -- No dividir líneas largas
 
-vim.opt.swapfile = false
-vim.opt.backup = false
+-- ======================
+-- 4. Manejo de Archivos
+-- ======================
+vim.opt.swapfile = false         -- Desactiva archivos .swp
+vim.opt.backup = false           -- Desactiva archivos de respaldo
+vim.opt.undofile = true          -- Habilita historial de cambios persistente
+
+-- Configuración específica para sistemas no-Windows
 if vim.loop.os_uname().sysname ~= "Windows_NT" then
-  vim.opt.undodir = os.getenv("HOME") .. "/.vim/undodir"
+  vim.opt.undodir = os.getenv("HOME") .. "/.vim/undodir"  -- Directorio para undo persistente
 end
-vim.opt.undofile = true
 
-vim.opt.incsearch = true
+-- ======================
+-- 5. Comportamiento de Búsqueda
+-- ======================
+vim.opt.incsearch = true         -- Búsqueda incremental
+vim.opt.isfname:append("@-@")    -- Caracteres especiales en nombres de archivo
 
-vim.opt.scrolloff = 8
-vim.opt.signcolumn = "yes"
-vim.opt.isfname:append("@-@")
-
-vim.opt.updatetime = 50
-
-vim.opt.colorcolumn = "1000"
+-- ======================
+-- 6. Rendimiento
+-- ======================
+vim.opt.updatetime = 50          -- Tiempo de actualización para plugins

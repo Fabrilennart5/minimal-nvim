@@ -1,8 +1,14 @@
--- My personal nvim config
--- loads core components inthis order:
--- 1.- Key mapping (remap.lua)
--- 2.- PLugin manager (lazy.lua)
--- 3.- Edito settings (set.lua)
-require("fabri.remap")
-require("fabri.lazy")
-require("fabri.set")
+-- ======================
+-- 1. Mapeo de teclas personalizadas
+-- ======================
+require("fabri.remap")  -- Carga todas las configuraciones de keymaps
+
+-- ======================
+-- 2. Configuración del gestor de plugins
+-- ======================
+require("fabri.lazy")   -- Configura Lazy.nvim y carga todos los plugins
+
+-- ======================
+-- 3. Configuración básica del editor
+-- ======================
+require("fabri.set")    -- Ajustes básicos de Neovim (opciones, settings, etc.)
