@@ -16,7 +16,7 @@ mason.setup({
 })
 
 mason_lspconfig.setup({
-  ensure_installed = { 'rust_analyzer', 'ruff', 'lua_ls', 'jdtls' },
+  ensure_installed = { 'rust_analyzer', 'ruff', 'jdtls' },
   automatic_installation = true, -- Instalación automática al abrir archivos
 })
 
