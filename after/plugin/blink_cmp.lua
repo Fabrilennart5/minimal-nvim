@@ -1,12 +1,17 @@
+local ok, blink_cmp = pcall(require, "blink.cmp")
+if not ok then
+  vim.notify("blink.cmp no se pudo cargar", vim.log.levels.ERROR)
+  return
+end
 
-local blink = require('blink.cmp')
-
-blink.setup({
-  keymap = { preset = 'default' },
-  appearance = {
-    use_nvim_cmp_as_default = true,
-    nerd_font_variant = 'mono',
+blink_cmp.setup({
+  mappings = {
+    ["<Tab>"] = "select_next",
+    ["<S-Tab>"] = "select_prev",
+    ["<CR>"] = "accept_and_enter",
+    ["<C-e>"] = "cancel",
+    ["<C-d>"] = "scroll_documentation_down",
+    ["<C-u>"] = "scroll_documentation_up",
   },
-  signature = { enabled = true },
 })
 
