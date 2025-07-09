@@ -40,7 +40,6 @@ require('lazy').setup({
     version = '1.*',
     dependencies = {
       'rafamadriz/friendly-snippets',
-      -- Eliminamos la dependencia de nvim-cmp ya que blink lo reemplaza
     }
   },
 
